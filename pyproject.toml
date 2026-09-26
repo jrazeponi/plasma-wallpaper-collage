@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plasma-wallpaper-collage"
+dynamic = ["version"]
+description = "Per-monitor wallpaper collages for KDE Plasma 6 from Reddit, wallhaven and your own image sources"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "José Roberto (jrazeponi)" }]
+keywords = ["kde", "plasma", "wallpaper", "collage", "reddit", "wallhaven"]
+classifiers = [
+    "Environment :: X11 Applications :: KDE",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Desktop Environment :: K Desktop Environment (KDE)",
+]
+dependencies = [
+    "curl_cffi>=0.15",
+    "rookiepy>=0.5",
+    "pillow>=10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jrazeponi/plasma-wallpaper-collage"
+
+[project.scripts]
+plasma-wallpaper-collage = "plasma_wallpaper_collage:main"
+
+[tool.setuptools]
+py-modules = ["plasma_wallpaper_collage"]
+
+[tool.setuptools.dynamic]
+version = { attr = "plasma_wallpaper_collage.__version__" }

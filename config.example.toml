@@ -1,0 +1,97 @@
+# Configuração do plasma-wallpaper-collage
+#
+# Copie para ~/.config/plasma-wallpaper-collage/config.toml e ajuste.
+#
+# Toda chave de [geral], [cache], [colagem] e [wallhaven] é opcional: a que
+# faltar usa o padrão do programa (o mesmo valor escrito aqui). Os perfis só
+# existem se estiverem neste arquivo. Caminhos aceitam "~".
+#
+#   plasma-wallpaper-collage              roda o perfil_padrao
+#   plasma-wallpaper-collage NOME         roda o perfil [perfis.NOME]
+#   plasma-wallpaper-collage --listar     lista fontes e perfis
+#   plasma-wallpaper-collage --config X   usa outro arquivo de configuração
+
+[geral]
+perfil_padrao = "sfw"                 # usado quando nenhum perfil é informado
+pasta_wallpapers = "~/Wallpapers"     # cache padrão de cada perfil: <pasta>/<perfil>
+# Downloads em andamento; deve estar no mesmo disco do cache.
+pasta_temporaria = "~/.cache/plasma-wallpaper-collage/tmp"
+# Navegador de onde ler os cookies do Reddit (precisa estar logado nele).
+# Um nome ou uma lista, tentada em ordem, ex.: ["firefox", "chrome"].
+# Aceita: firefox, chrome, chromium, edge, brave, opera, opera_gx, vivaldi,
+# librewolf, arc.
+navegador_cookies = "firefox"
+# Navegador que o HTTP imita (fingerprint TLS) para passar pelo anti-bot:
+# firefox, chrome, edge, safari (ou versões, ex.: chrome124).
+imitar_navegador = "firefox"
+timeout = 15                          # segundos por requisição
+downloads_paralelos = 6
+
+[cache]
+max_imagens = 50           # por pasta de cache; as mais antigas saem primeiro
+novas_por_execucao = 20    # imagens novas por execução (0 = só remonta as colagens)
+historico_dias = 7         # não baixa de novo o que já foi baixado/rejeitado/apagado
+
+[colagem]
+largura = 1920             # tamanho de cada colagem (uma por monitor)
+altura = 1080
+imagens_por_colagem = 4    # 1, 2, 3, 4, 6 ou 9
+formato = "jpg"            # jpg, png ou webp
+qualidade = 90             # jpg e webp: 1 a 100 (png ignora)
+desfoque = 18              # raio do desfoque do fundo de cada célula (0 = sem)
+# Como o KDE encaixa a colagem na tela:
+# centralizar (sem escala), cortar (preenche e corta), ajustar (cabe inteira),
+# esticar ou lado_a_lado.
+ajuste_kde = "centralizar"
+monitores = 0              # 0 = detectar; ou número fixo de colagens
+monitores_fallback = 3     # usado se a detecção falhar
+
+[wallhaven]
+# Chave da API (em https://wallhaven.cc/settings/account, seção "API Key").
+# Só é necessária para conteúdo NSFW (purity=001 na URL de busca).
+# A variável de ambiente WALLHAVEN_API_KEY, se definida, tem prioridade.
+# Se preencher aqui, proteja o arquivo: chmod 600 config.toml
+chave_api = ""
+
+# ── Perfis ───────────────────────────────────────────────────────────────────
+# [perfis.NOME]
+#   fonte        "reddit", "wallhaven" ou uma fonte extra (obrigatório)
+#   cache        pasta das imagens (padrão: <pasta_wallpapers>/NOME)
+#   paginas      páginas lidas da fonte (padrão: reddit 1 de 100 posts,
+#                wallhaven 3 de 24 imagens)
+#   min_largura  descarta imagens mais estreitas, em px (padrão 1920; 0 desliga)
+#
+# reddit     subreddit  um ou vários juntos: "wallpaper+MinimalWallpaper"
+#            sort       hot, new, top, rising ou controversial (padrão hot)
+#            top_time   com top/controversial: hour, day, week, month, year, all
+#            Posts +18 não são filtrados: o subreddit escolhido decide.
+# wallhaven  url        busca montada no site e copiada do navegador; todos os
+#                       filtros (categorias, pureza, resolução, proporção, cor,
+#                       ordenação, q=) vão junto.
+#
+# Fontes extras: arquivos .py em ~/.config/plasma-wallpaper-collage/fontes/
+# (exemplo pronto em exemplos/fontes/bing.py). Cada uma pode aceitar chaves
+# próprias no perfil.
+
+[perfis.sfw]
+fonte = "reddit"
+subreddit = "wallpaper+MinimalWallpaper"
+sort = "hot"
+
+[perfis.top-semana]
+fonte = "reddit"
+subreddit = "wallpapers"
+sort = "top"
+top_time = "week"
+paginas = 2
+
+[perfis.natureza]
+fonte = "wallhaven"
+# Ordenação fixa (views, favorites...) traz sempre as mesmas imagens;
+# sorting=random ou sorting=toplist&topRange=1w dão mais variedade.
+url = "https://wallhaven.cc/search?q=nature&categories=100&purity=100&atleast=1920x1080&ratios=16x9&sorting=random"
+
+# Com exemplos/fontes/bing.py copiado para a pasta de fontes extras:
+# [perfis.bing]
+# fonte = "bing"
+# mercado = "pt-BR"
