@@ -45,9 +45,10 @@ systemd timer): every run gives each screen a fresh mosaic.
 
 ## Requirements
 
-- Linux with **KDE Plasma 6** (`qdbus-qt6` and the `org.kde.image` wallpaper
-  plugin).
-- Python 3.11+.
+- Linux with **KDE Plasma 6** (the `org.kde.image` wallpaper plugin and Qt 6's
+  `qdbus`: package `qdbus-qt6` on Debian/Ubuntu, `qt6-tools` on Arch).
+- Python 3.11+. On 3.13 or newer, rookiepy is compiled during the install (see
+  [Installation](#installation)).
 - For Reddit: a browser logged in to reddit.com. The cookies are read locally
   with [rookiepy](https://github.com/thewh1teagle/rookiepy); Reddit blocks
   anonymous clients.
@@ -72,6 +73,14 @@ python3 -m venv .venv
 .venv/bin/pip install -e .          # -e: a `git pull` updates the installed command
 mkdir -p ~/.config/plasma-wallpaper-collage
 cp config.example.toml ~/.config/plasma-wallpaper-collage/config.toml
+```
+
+Python 3.13 or newer: rookiepy only ships wheels up to 3.12, so pip compiles
+it during the install. That needs Rust (`cargo`) and
+`PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1` in front of the install command:
+
+```bash
+PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 pipx install git+https://github.com/jrazeponi/plasma-wallpaper-collage
 ```
 
 ## Usage
@@ -234,7 +243,7 @@ Cron, every hour:
    happens after downloading, so a network failure never costs you images.
 5. Pick images for each monitor without repeating them across monitors while
    possible, and build the collages.
-6. Apply them through `qdbus-qt6`, one per screen. Old collages are deleted
+6. Apply them through Qt 6's `qdbus`, one per screen. Old collages are deleted
    only after the new ones are applied.
 
 ## Troubleshooting
@@ -247,6 +256,7 @@ Cron, every hour:
 | `chave da API recusada (401)` | wrong wallhaven key |
 | `A fonte não devolveu nenhuma imagem` | empty search, site layout change, or blocked (403/429) |
 | `apagada(s) na origem (404)` | normal: removed posts still listed in the feed |
+| `qdbus do Qt 6 não encontrado` | Qt 6's qdbus is not installed (Debian/Ubuntu: package `qdbus-qt6`) |
 | `Erro ao definir wallpaper via DBus` | no Plasma session (e.g. logged out); current collages are kept |
 | `Configuração: ...` | config file error; the message names the section and key |
 

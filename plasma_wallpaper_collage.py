@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import subprocess
 import sys
 import threading
@@ -38,7 +39,7 @@ import rookiepy
 from curl_cffi import requests as http
 from PIL import Image, ImageFilter, ImageOps
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 APP = "plasma-wallpaper-collage"
 PASTA_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME") or "~/.config").expanduser() / APP
 PASTA_CACHE = Path(os.environ.get("XDG_CACHE_HOME") or "~/.cache").expanduser() / APP
@@ -117,6 +118,10 @@ NAVEGADORES_COOKIES = ("firefox", "chrome", "chromium", "edge", "brave", "opera"
 FORMATOS = {"jpg": "JPEG", "png": "PNG", "webp": "WEBP"}
 # FillMode do plugin org.kde.image
 AJUSTES_KDE = {"centralizar": 6, "cortar": 2, "ajustar": 1, "esticar": 0, "lado_a_lado": 3}
+# O qdbus do Qt 6 muda de nome conforme a distro: qdbus6 (Arch, Debian 13+,
+# Ubuntu 25.04+), qdbus-qt6 (Fedora) ou só /usr/lib/qt6/bin/qdbus, fora do PATH
+# (Debian/Ubuntu mais antigos). O qdbus puro vem por último: mesmo o do Qt 5 serve.
+QDBUS = ("qdbus6", "qdbus-qt6", "/usr/lib/qt6/bin/qdbus", "qdbus")
 # Layout do grid (colunas, linhas) conforme o número de imagens na colagem
 LAYOUTS = {1: (1, 1), 2: (2, 1), 3: (3, 1), 4: (2, 2), 6: (3, 2), 9: (3, 3)}
 
@@ -597,12 +602,19 @@ def set_wallpapers(paths):
     }}
     """
 
+    qdbus = next(filter(None, map(shutil.which, QDBUS)), None)
+    if not qdbus:
+        logger.error(f"qdbus do Qt 6 não encontrado (procurado: {', '.join(QDBUS)}). "
+                     f"No Debian/Ubuntu, instale o pacote qdbus-qt6.")
+        return False
+    logger.debug(f"Usando {qdbus}")
+
     env = {**os.environ}
     env.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{os.getuid()}/bus")
 
     def run_script(script):
         result = subprocess.run([
-            "qdbus-qt6", "org.kde.plasmashell", "/PlasmaShell",
+            qdbus, "org.kde.plasmashell", "/PlasmaShell",
             "org.kde.PlasmaShell.evaluateScript", script
         ], check=True, capture_output=True, text=True, env=env)
         if result.stderr:
