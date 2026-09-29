@@ -44,9 +44,10 @@ ganha um mosaico novo.
 
 ## Requisitos
 
-- Linux com **KDE Plasma 6** (`qdbus-qt6` e o plugin de wallpaper
-  `org.kde.image`).
-- Python 3.11+.
+- Linux com **KDE Plasma 6** (o plugin de wallpaper `org.kde.image` e o `qdbus`
+  do Qt 6: pacote `qdbus-qt6` no Debian/Ubuntu, `qt6-tools` no Arch).
+- Python 3.11+. No 3.13 ou mais novo, o rookiepy é compilado na instalação (ver
+  [Instalação](#instalação)).
 - Para o Reddit: um navegador logado no reddit.com. Os cookies são lidos
   localmente com o [rookiepy](https://github.com/thewh1teagle/rookiepy); o
   Reddit bloqueia clientes anônimos.
@@ -71,6 +72,14 @@ python3 -m venv .venv
 .venv/bin/pip install -e .          # -e: um `git pull` já atualiza o comando instalado
 mkdir -p ~/.config/plasma-wallpaper-collage
 cp config.example.toml ~/.config/plasma-wallpaper-collage/config.toml
+```
+
+Python 3.13 ou mais novo: o rookiepy só tem wheel até o 3.12, então o pip o
+compila na instalação. Isso exige o Rust (`cargo`) e
+`PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1` na frente do comando de instalação:
+
+```bash
+PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 pipx install git+https://github.com/jrazeponi/plasma-wallpaper-collage
 ```
 
 ## Uso
@@ -232,7 +241,7 @@ Cron, de hora em hora:
    vem depois do download, então uma falha de rede não custa imagens.
 5. Sorteia as imagens para cada monitor, sem repetir entre monitores enquanto
    der, e monta as colagens.
-6. Aplica pelo `qdbus-qt6`, uma por tela. As colagens antigas só são apagadas
+6. Aplica pelo `qdbus` do Qt 6, uma por tela. As colagens antigas só são apagadas
    depois que as novas são aplicadas.
 
 ## Problemas comuns
@@ -245,6 +254,7 @@ Cron, de hora em hora:
 | `chave da API recusada (401)` | chave do wallhaven errada |
 | `A fonte não devolveu nenhuma imagem` | busca vazia, site mudou de layout, ou bloqueio (403/429) |
 | `apagada(s) na origem (404)` | normal: posts removidos que ainda aparecem no feed |
+| `qdbus do Qt 6 não encontrado` | o qdbus do Qt 6 não está instalado (Debian/Ubuntu: pacote `qdbus-qt6`) |
 | `Erro ao definir wallpaper via DBus` | sem sessão do Plasma (ex.: deslogado); as colagens atuais são mantidas |
 | `Configuração: ...` | erro no arquivo de configuração; a mensagem diz a seção e a chave |
 
