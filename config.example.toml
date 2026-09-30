@@ -56,7 +56,8 @@ chave_api = ""
 # ── Perfis ───────────────────────────────────────────────────────────────────
 # [perfis.NOME]
 #   fonte        "reddit", "wallhaven" ou uma fonte extra (obrigatório)
-#   cache        pasta das imagens (padrão: <pasta_wallpapers>/NOME)
+#   cache        pasta das imagens (padrão: <pasta_wallpapers>/NOME; wallhaven que
+#                aceita NSFW: <pasta_wallpapers>/nsfw/NOME, ver abaixo)
 #   paginas      páginas lidas da fonte (padrão: reddit 1 de 100 posts,
 #                wallhaven 3 de 24 imagens)
 #   min_largura  descarta imagens mais estreitas, em px (padrão 1920; 0 desliga)
@@ -68,6 +69,12 @@ chave_api = ""
 # wallhaven  url        busca montada no site e copiada do navegador; todos os
 #                       filtros (categorias, pureza, resolução, proporção, cor,
 #                       ordenação, q=) vão junto.
+#            NSFW       se o último dígito de purity= for 1 (001, 011, 101, 111),
+#                       a busca aceita conteúdo +18 e o perfil inteiro (imagens,
+#                       histórico e colagens) vai para <pasta_wallpapers>/nsfw/NOME,
+#                       seja qual for o nome do perfil. O perfil chamado nsfw usa
+#                       a própria <pasta_wallpapers>/nsfw. Com `cache` no perfil,
+#                       vale o que você escreveu. Precisa da chave da API.
 #
 # Fontes extras: arquivos .py em ~/.config/plasma-wallpaper-collage/fontes/
 # (exemplo pronto em exemplos/fontes/bing.py). Cada uma pode aceitar chaves
@@ -90,6 +97,12 @@ fonte = "wallhaven"
 # Ordenação fixa (views, favorites...) traz sempre as mesmas imagens;
 # sorting=random ou sorting=toplist&topRange=1w dão mais variedade.
 url = "https://wallhaven.cc/search?q=nature&categories=100&purity=100&atleast=1920x1080&ratios=16x9&sorting=random"
+
+# Busca NSFW (purity=001; precisa da chave da API). Sem `cache`, as imagens vão
+# para <pasta_wallpapers>/nsfw/adulto, mesmo com outro nome de perfil.
+# [perfis.adulto]
+# fonte = "wallhaven"
+# url = "https://wallhaven.cc/search?categories=111&purity=001&atleast=1920x1080&ratios=16x9&sorting=random"
 
 # Com exemplos/fontes/bing.py copiado para a pasta de fontes extras:
 # [perfis.bing]

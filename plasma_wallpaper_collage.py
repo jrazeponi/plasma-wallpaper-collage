@@ -39,7 +39,7 @@ import rookiepy
 from curl_cffi import requests as http
 from PIL import Image, ImageFilter, ImageOps
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 APP = "plasma-wallpaper-collage"
 PASTA_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME") or "~/.config").expanduser() / APP
 PASTA_CACHE = Path(os.environ.get("XDG_CACHE_HOME") or "~/.cache").expanduser() / APP
@@ -190,6 +190,12 @@ def carregar_perfil(nome, tabela, base):
     for ok, msg in checagens:
         if not ok:
             raise ErroConfig(f"{onde} {msg}")
+    # Busca que aceita NSFW (sozinho ou misturado com o resto): a pasta padrão
+    # passa a ser <pasta_wallpapers>/nsfw/NOME (o perfil chamado nsfw usa a
+    # própria nsfw). `cache` no perfil continua mandando.
+    if "cache" not in tabela and fonte == "wallhaven" and wallhaven_nsfw(p.url):
+        pasta = base.pasta_wallpapers / "nsfw"
+        p = replace(p, cache=pasta if nome == "nsfw" else pasta / nome)
     return p
 
 
@@ -335,6 +341,15 @@ def imagens_reddit(perfil):
     return imagens
 
 
+def wallhaven_nsfw(url):
+    """
+    True se a busca aceita conteúdo NSFW. purity=XYZ liga sfw (X), sketchy (Y) e
+    nsfw (Z): basta o último dígito ser 1, sozinho ou com os outros (001, 011,
+    101, 111). Sem purity, a API assume 100.
+    """
+    return dict(parse_qsl(urlsplit(url).query)).get("purity", "100").endswith("1")
+
+
 def imagens_wallhaven(perfil):
     """
     Repassa os filtros da URL de busca do site para a API e lê perfil.paginas
@@ -342,7 +357,7 @@ def imagens_wallhaven(perfil):
     """
     params = dict(parse_qsl(urlsplit(perfil.url).query))
     chave = os.environ.get("WALLHAVEN_API_KEY") or cfg.wallhaven_chave_api
-    if not chave and params.get("purity", "100").endswith("1"):
+    if not chave and wallhaven_nsfw(perfil.url):
         logger.warning("Sem chave da API do wallhaven (WALLHAVEN_API_KEY ou [wallhaven] "
                        "chave_api): a API não devolve conteúdo NSFW sem ela.")
     # A chave vai no header, não na URL, para não aparecer em mensagem de erro/log
