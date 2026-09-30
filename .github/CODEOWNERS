@@ -1,0 +1,4 @@
+# Every pull request needs a review from the maintainer.
+# With "Require review from Code Owners" enabled in the ruleset for `main`,
+# only the maintainer's approval lets a pull request through.
+* @jrazeponi
