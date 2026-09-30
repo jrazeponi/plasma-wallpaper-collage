@@ -16,7 +16,8 @@ ganha um mosaico novo.
     ordenação `hot`/`new`/`top`/`rising`/`controversial`, galerias e paginação.
   - **wallhaven**: monte a busca no site e cole a URL. Todos os filtros
     (categorias, pureza, resolução, proporção, cor, ordenação e termos) vão
-    para a API. Com a chave da API, a busca também traz conteúdo NSFW.
+    para a API. Com a chave da API, a busca também traz conteúdo NSFW, salvo
+    numa pasta `nsfw/` à parte.
   - **Fontes extras**: um arquivo `.py` pequeno na pasta de configuração
     acrescenta qualquer site. Vem um exemplo com a imagem do dia do Bing.
 - **Colagens**
@@ -108,7 +109,7 @@ cada chave. Uma chave que falte em `[geral]`, `[cache]`, `[colagem]` ou
 | Seção | Chave | Padrão | O que é |
 |---|---|---|---|
 | `[geral]` | `perfil_padrao` | `"sfw"` | perfil usado quando nenhum é informado |
-| | `pasta_wallpapers` | `"~/Wallpapers"` | cache padrão de cada perfil: `<esta pasta>/<perfil>` |
+| | `pasta_wallpapers` | `"~/Wallpapers"` | cache padrão de cada perfil: `<esta pasta>/<perfil>` (busca NSFW do wallhaven: `<esta pasta>/nsfw/<perfil>`) |
 | | `pasta_temporaria` | `~/.cache/plasma-wallpaper-collage/tmp` | downloads em andamento (mesmo disco do cache) |
 | | `navegador_cookies` | `"firefox"` | navegador (ou lista, tentada em ordem) de onde ler os cookies do Reddit |
 | | `imitar_navegador` | `"firefox"` | fingerprint TLS imitado (`firefox`, `chrome`, `edge`, `safari`…) |
@@ -131,7 +132,8 @@ Cada tabela `[perfis.NOME]` é um perfil, rodado com
 
 - Chaves comuns:
   - `fonte`: a fonte (obrigatória);
-  - `cache`: pasta do cache;
+  - `cache`: pasta do cache (padrão `<pasta_wallpapers>/NOME`; para buscas NSFW
+    do wallhaven, ver [Pasta das buscas NSFW](#pasta-das-buscas-nsfw));
   - `paginas`: páginas lidas da fonte;
   - `min_largura`: largura mínima em px (padrão 1920; `0` desliga).
 - Reddit:
@@ -183,6 +185,28 @@ volta vazia e o log mostra um aviso.
 
 O cron não carrega o seu perfil do shell. No cron, use o arquivo de
 configuração ou carregue a variável na própria linha (ver [Automação](#automação)).
+
+### Pasta das buscas NSFW
+
+Um perfil wallhaven cuja URL aceita conteúdo NSFW não precisa de nome especial:
+o programa o guarda em `<pasta_wallpapers>/nsfw/NOME`. O critério é o mesmo da
+chave da API: o último dígito de `purity=` é `1`, sozinho (`001`) ou junto dos
+outros (`011`, `101`, `111`).
+
+- O perfil inteiro vai para lá (imagens, histórico e colagens), mesmo numa busca
+  mista como `purity=111`: a colagem mistura tudo o que está na pasta, então
+  qualquer imagem pode ser +18.
+- `sketchy` sozinho (`purity=010` ou `110`) não conta.
+- O perfil chamado `nsfw` usa `<pasta_wallpapers>/nsfw` direto, não `nsfw/nsfw`.
+- Com `cache` no perfil, vale a pasta que você escreveu.
+- Cada perfil mantém o próprio cache: dois perfis NSFW não misturam imagens.
+
+```toml
+[perfis.adulto]
+fonte = "wallhaven"
+url = "https://wallhaven.cc/search?categories=111&purity=001&sorting=random"
+# imagens em ~/Wallpapers/nsfw/adulto
+```
 
 ## Fontes extras
 

@@ -17,7 +17,8 @@ systemd timer): every run gives each screen a fresh mosaic.
     pagination.
   - **wallhaven**: build a search on the site and paste its URL. Every filter
     (categories, purity, resolution, ratio, color, sorting, query) is passed to
-    the API. An API key unlocks NSFW results.
+    the API. An API key unlocks NSFW results, which are saved in a separate
+    `nsfw/` folder.
   - **Extra sources**: drop a small `.py` file in the config folder to add any
     site. A Bing "image of the day" example is included.
 - **Collages**
@@ -110,7 +111,7 @@ file.
 | Section | Key | Default | Meaning |
 |---|---|---|---|
 | `[geral]` | `perfil_padrao` | `"sfw"` | profile used when none is given |
-| | `pasta_wallpapers` | `"~/Wallpapers"` | each profile's cache defaults to `<this>/<profile>` |
+| | `pasta_wallpapers` | `"~/Wallpapers"` | each profile's cache defaults to `<this>/<profile>` (NSFW wallhaven searches: `<this>/nsfw/<profile>`) |
 | | `pasta_temporaria` | `~/.cache/plasma-wallpaper-collage/tmp` | in-progress downloads (same disk as the cache) |
 | | `navegador_cookies` | `"firefox"` | browser (or list, tried in order) to read Reddit cookies from |
 | | `imitar_navegador` | `"firefox"` | TLS fingerprint to impersonate (`firefox`, `chrome`, `edge`, `safari`…) |
@@ -133,7 +134,8 @@ Each `[perfis.NAME]` table is a profile, run with
 
 - Common keys:
   - `fonte`: the source (required);
-  - `cache`: cache folder;
+  - `cache`: cache folder (default `<pasta_wallpapers>/NAME`; for NSFW wallhaven
+    searches see [NSFW search folder](#nsfw-search-folder));
   - `paginas`: pages read from the source;
   - `min_largura`: minimum image width in px (default 1920; `0` disables).
 - Reddit keys:
@@ -185,6 +187,29 @@ search comes back empty and a warning is logged.
 
 Cron does not load your shell profile. For cron, either use the config file or
 load the variable in the cron line itself (see [Automation](#automation)).
+
+### NSFW search folder
+
+A wallhaven profile whose URL allows NSFW results needs no special name: it is
+stored in `<pasta_wallpapers>/nsfw/NAME`. The test is the same one used for the
+API key: the last digit of `purity=` is `1`, alone (`001`) or together with the
+others (`011`, `101`, `111`).
+
+- The whole profile goes there (images, history and collages), even for a mixed
+  search like `purity=111`: a collage blends everything in the folder, so any
+  image may be 18+.
+- `sketchy` alone (`purity=010` or `110`) does not count.
+- The profile named `nsfw` uses `<pasta_wallpapers>/nsfw` itself, not
+  `nsfw/nsfw`.
+- `cache` in the profile wins over all of this.
+- Each profile keeps its own cache: two NSFW profiles never mix images.
+
+```toml
+[perfis.adult]
+fonte = "wallhaven"
+url = "https://wallhaven.cc/search?categories=111&purity=001&sorting=random"
+# images end up in ~/Wallpapers/nsfw/adult
+```
 
 ## Extra sources
 
