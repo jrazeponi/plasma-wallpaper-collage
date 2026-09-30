@@ -99,8 +99,8 @@ fonte = "wallhaven"
 url = "https://wallhaven.cc/search?q=nature&categories=100&purity=100&atleast=1920x1080&ratios=16x9&sorting=random"
 
 # Busca NSFW (purity=001; precisa da chave da API). Sem `cache`, as imagens vão
-# para <pasta_wallpapers>/nsfw/adulto, mesmo com outro nome de perfil.
-# [perfis.adulto]
+# para <pasta_wallpapers>/nsfw/nsfwallhaven, mesmo com outro nome de perfil.
+# [perfis.nsfwallhaven]
 # fonte = "wallhaven"
 # url = "https://wallhaven.cc/search?categories=111&purity=001&atleast=1920x1080&ratios=16x9&sorting=random"
 

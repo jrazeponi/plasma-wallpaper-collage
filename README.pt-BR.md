@@ -202,10 +202,10 @@ outros (`011`, `101`, `111`).
 - Cada perfil mantém o próprio cache: dois perfis NSFW não misturam imagens.
 
 ```toml
-[perfis.adulto]
+[perfis.nsfwallhaven]
 fonte = "wallhaven"
 url = "https://wallhaven.cc/search?categories=111&purity=001&sorting=random"
-# imagens em ~/Wallpapers/nsfw/adulto
+# imagens em ~/Wallpapers/nsfw/nsfwallhaven
 ```
 
 ## Fontes extras
